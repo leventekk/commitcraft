@@ -142,7 +142,9 @@ async fn main() -> Result<(), confy::ConfyError> {
 				.prompt();
 
 			match message_confirmed {
-				Ok(true) => Executor::confirm_message(&generated_message),
+				Ok(true) => {
+					let _ = Executor::confirm_message(&generated_message);
+				}
 				Ok(false) => {
 					println!("That's too bad, I've heard great things about it.")
 				}

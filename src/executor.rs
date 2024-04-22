@@ -1,21 +1,19 @@
+use std::error;
 use std::process::Command;
 
 pub struct Executor {}
 
 impl Executor {
-	pub fn confirm_message(message: &str) {
+	pub fn confirm_message(message: &str) -> Result<String, Box<dyn error::Error>> {
 		let arguments = vec!["--no-pager", "commit", "-m", message];
 
-		let output = match Command::new("git").args(&arguments).output() {
-			Ok(r) => r,
-			Err(..) => panic!("Error executing git command."),
-		};
+		self::Executor::execute(arguments)
+	}
 
-		let response = match String::from_utf8(output.stdout) {
-			Ok(r) => r,
-			Err(..) => panic!("Error parsing git response."),
-		};
+	pub fn execute(arguments: Vec<&str>) -> Result<String, Box<dyn error::Error>> {
+		let output = Command::new("git").args(&arguments).output()?;
+		let response = String::from_utf8(output.stdout)?;
 
-		println!("{}", response);
+		Ok(response)
 	}
 }
