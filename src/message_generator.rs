@@ -1,5 +1,3 @@
-use std::env;
-
 use openai_dive::v1::api::Client;
 use openai_dive::v1::models::Gpt35Engine;
 use openai_dive::v1::resources::chat::{
@@ -8,12 +6,11 @@ use openai_dive::v1::resources::chat::{
 };
 
 async fn execute_request(
+    api_key: &str,
 	system_messge: &str,
 	user_message: &str,
 ) -> ChatCompletionResponse {
-	let api_key = env::var("OPENAI_API_KEY").expect("$OPENAI_API_KEY is not set");
-
-	let client = Client::new(api_key);
+	let client = Client::new(api_key.to_string());
 
 	let parameters = ChatCompletionParameters {
 		model: Gpt35Engine::Gpt35Turbo1106.to_string(),
@@ -55,11 +52,12 @@ fn extract_response_choice(response: ChatCompletionResponse) -> Option<String> {
 
 // we should provide a basic example of how a git diff looks like
 pub async fn generate_message(
+	api_key: &str,
 	git_diff: &str,
-    // TODO: here we need to inject the builder
+	// TODO: here we need to inject the builder
 	instructions: String,
 ) -> String {
-	let response = execute_request(&instructions, git_diff).await;
+	let response = execute_request(api_key, &instructions, git_diff).await;
 	let result = extract_response_choice(response);
 
 	match result {
