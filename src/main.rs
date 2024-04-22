@@ -7,6 +7,7 @@ use inquire::Confirm;
 use instruction_builder::InstructionBuilder;
 use instructions::InstructionStrategy;
 use serde_derive::{Deserialize, Serialize};
+use std::fmt::Write;
 
 mod diff_collector;
 mod executor;
@@ -14,7 +15,7 @@ mod instruction_builder;
 mod instructions;
 mod message_generator;
 
-static APP_NAME: &str = "commitcraft";
+const APP_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 enum Format {
@@ -53,6 +54,7 @@ enum Commands {
 #[derive(Debug, Serialize, Deserialize)]
 struct AppConfig {
 	openai_api_key: String,
+	// add_description: bool,
 }
 
 /// `MyConfig` implements `Default`
@@ -60,6 +62,7 @@ impl ::std::default::Default for AppConfig {
 	fn default() -> Self {
 		Self {
 			openai_api_key: "".into(),
+			// add_description: true,
 		}
 	}
 }
@@ -67,24 +70,21 @@ impl ::std::default::Default for AppConfig {
 #[tokio::main]
 async fn main() -> Result<(), confy::ConfyError> {
 	let args = Args::parse();
-	let cfg: AppConfig = confy::load(APP_NAME, None)?;
+	let app_config: AppConfig = confy::load(APP_NAME, None)?;
 
 	match &args.command {
 		Some(Commands::Config { api_key }) => {
-			if !api_key.is_empty() {
-				confy::store(
-					APP_NAME,
-					None,
-					AppConfig {
-						openai_api_key: api_key.clone(),
-					},
-				)?;
+			let mut config = AppConfig { ..app_config };
 
-				println!("Configuration saved.")
+			if !api_key.is_empty() {
+				config.openai_api_key = api_key.clone();
 			}
+
+			confy::store(APP_NAME, None, config)?;
+			println!("Configuration saved.")
 		}
 		None => {
-			if cfg.openai_api_key.is_empty() {
+			if app_config.openai_api_key.is_empty() {
 				eprintln!("OpenAI API key is not set.");
 				std::process::exit(1);
 			}
@@ -96,7 +96,7 @@ async fn main() -> Result<(), confy::ConfyError> {
                 Format::Raw => Box::new(instructions::raw::RawCommitInstructionStrategy),
             };
 
-			let collected_changed = match diff_collector::collect_changes() {
+			let changes = match diff_collector::collect_changes() {
 				Ok(r) => r,
 				Err(e) => {
 					eprintln!("No stashed changes were found: {}", e);
@@ -104,24 +104,36 @@ async fn main() -> Result<(), confy::ConfyError> {
 				}
 			};
 
-			if collected_changed.is_empty() {
+			if changes.files.is_empty() {
 				eprintln!("No stashed changes were found");
 				std::process::exit(1);
 			}
 
-			let progress_bar = ProgressBar::new_spinner()
-				.with_message("Generating commit message");
+			let formatted_list = changes
+				.files
+				.iter()
+				.map(|line| {
+					let mut formatted_line = String::new();
+					writeln!(&mut formatted_line, "- {}", line).unwrap();
+					formatted_line
+				})
+				.collect::<String>();
+
+			println!("Stashed files:\n{:}", formatted_list);
+
+			let progress_bar =
+				ProgressBar::new_spinner().with_message("Generating commit message");
 			progress_bar.enable_steady_tick(Duration::from_millis(120));
 
 			let generated_message = message_generator::generate_message(
-				&cfg.openai_api_key,
-				&collected_changed,
+				&app_config.openai_api_key,
+				&changes.diff,
 				// TODO: this builder needs a constructor where I can inject the instructions
 				InstructionBuilder::build(instructions_injector),
 			)
 			.await;
 
-            progress_bar.finish_and_clear();
+			progress_bar.finish_and_clear();
 
 			println!("Here is the generated commit:\n\n{:}\n", generated_message);
 
