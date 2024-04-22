@@ -1,9 +1,12 @@
 use clap::{Parser, Subcommand, ValueEnum};
+use inquire::Confirm;
 use instruction_builder::InstructionBuilder;
 use instructions::InstructionStrategy;
+use executor::Executor;
 use serde_derive::{Deserialize, Serialize};
 
 mod diff_collector;
+mod executor;
 mod instruction_builder;
 mod instructions;
 mod message_generator;
@@ -32,9 +35,9 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Commands {
-	/// does testing things
+	/// Update configuration options
 	Config {
-		/// lists test values
+		/// set api key for the OpenAI API
 		#[arg(short, long)]
 		api_key: String,
 	},
@@ -93,7 +96,7 @@ async fn main() -> Result<(), confy::ConfyError> {
 			let collected_changed = match diff_collector::collect_changes() {
 				Ok(r) => r,
 				Err(e) => {
-					eprintln!("No files were found: {}", e);
+					eprintln!("No stashed changes were found: {}", e);
 					std::process::exit(1);
 				}
 			};
@@ -111,7 +114,20 @@ async fn main() -> Result<(), confy::ConfyError> {
 			)
 			.await;
 
-			println!("{:}", generated_message);
+
+            println!("Here is the generated commit:\n\n{:}\n", generated_message);
+
+			let message_confirmed = Confirm::new("Do you want to use this message?")
+				.with_default(true)
+				.prompt();
+
+			match message_confirmed {
+				Ok(true) => Executor::confirm_message(&generated_message),
+				Ok(false) => {
+					println!("That's too bad, I've heard great things about it.")
+				}
+				Err(_) => println!("Error with questionnaire, try again later"),
+			}
 		}
 	}
 
