@@ -1,8 +1,11 @@
+use std::time::Duration;
+
 use clap::{Parser, Subcommand, ValueEnum};
+use executor::Executor;
+use indicatif::ProgressBar;
 use inquire::Confirm;
 use instruction_builder::InstructionBuilder;
 use instructions::InstructionStrategy;
-use executor::Executor;
 use serde_derive::{Deserialize, Serialize};
 
 mod diff_collector;
@@ -102,9 +105,13 @@ async fn main() -> Result<(), confy::ConfyError> {
 			};
 
 			if collected_changed.is_empty() {
-				eprintln!("No files were found.");
+				eprintln!("No stashed changes were found");
 				std::process::exit(1);
 			}
+
+			let progress_bar = ProgressBar::new_spinner()
+				.with_message("Generating commit message");
+			progress_bar.enable_steady_tick(Duration::from_millis(120));
 
 			let generated_message = message_generator::generate_message(
 				&cfg.openai_api_key,
@@ -114,8 +121,9 @@ async fn main() -> Result<(), confy::ConfyError> {
 			)
 			.await;
 
+            progress_bar.finish_and_clear();
 
-            println!("Here is the generated commit:\n\n{:}\n", generated_message);
+			println!("Here is the generated commit:\n\n{:}\n", generated_message);
 
 			let message_confirmed = Confirm::new("Do you want to use this message?")
 				.with_default(true)

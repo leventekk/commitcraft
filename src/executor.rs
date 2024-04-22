@@ -4,7 +4,7 @@ pub struct Executor {}
 
 impl Executor {
 	pub fn confirm_message(message: &str) {
-		let arguments = vec!["--no-pager", "commit", "--dry-run", "-m", message];
+		let arguments = vec!["--no-pager", "commit", "-m", message];
 
 		let output = match Command::new("git").args(&arguments).output() {
 			Ok(r) => r,
