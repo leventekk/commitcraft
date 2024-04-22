@@ -4,7 +4,8 @@ pub struct ConventionalCommitInstructionStrategy;
 
 impl InstructionStrategy for ConventionalCommitInstructionStrategy {
 	fn inject(&self) -> &str {
-        r"You suggest a conventional commit message. Don't add anything else to the response. The following describes conventional commits.
+        r"
+You suggest a conventional commit message. Don't add anything else to the response. The following describes conventional commits.
 
 # Conventional Commits 1.0.0
 

@@ -1,33 +1,8 @@
 use crate::instructions::InstructionStrategy;
 
-static INITIAL_PROMPT_INSTRUCTION: &str = r"You're a git commit generator expert. The user provides a `git diff` format for you and your task is to generate a commit message based on the given diff.
-
-Here is a sample of what a `git diff` looks like:
-```
-index ad4db42..f3b18a9 100644
---- a/src/server.ts
-+++ b/src/server.ts
-@@ -10,7 +10,7 @@
-import {
-    initWinstonLogger();
-    
-    const app = express();
-    -const port = 7799;
-    +const PORT = 7799;
-    
-    app.use(express.json());
-    
-    @@ -34,6 +34,6 @@
-    app.use((_, res, next) => {
-        // ROUTES
-        app.use(PROTECTED_ROUTER_URL, protectedRouter);
-        
-        -app.listen(port, () => {
-            -  console.log(\`Server listening on port \${port}\`);
-            +app.listen(process.env.PORT || PORT, () => {
-                +  console.log(\`Server listening on port \${PORT}\`);
-            });`
-```
+static INITIAL_PROMPT_INSTRUCTION: &str = r"
+You're a git commit generator expert.
+The user provides a `git diff` format for you and your task is to generate a commit message based on the given diff.
 ";
 
 static COMMIT_GUIDANCE: &str = r"
