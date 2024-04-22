@@ -41,10 +41,9 @@ Some guidance for generating the commit:
 ```
 - if there is only one item that can be listed in the [optional body] you can write it as a sentence, no need to use a dash
 - do not start the sentences with a capital letter, use small case everywhere
-- respond with a simple text without any markdown or code blocks
+- do not add any extra formatting to the commit message
+- remove the starting and ending backticks and also the new lines
 ";
-
-static DIFF_SEPARATOR: &str = "now here is the diff";
 
 pub struct InstructionBuilder {}
 
@@ -54,7 +53,6 @@ impl InstructionBuilder {
 			INITIAL_PROMPT_INSTRUCTION,
 			instruction_strategy.inject(),
 			COMMIT_GUIDANCE,
-			DIFF_SEPARATOR,
 		]
 		.join("\n")
 	}
