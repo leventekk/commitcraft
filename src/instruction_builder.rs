@@ -1,4 +1,4 @@
-use crate::instructions::InstructionStrategy;
+// use crate::instructions::InstructionStrategy;
 
 static INITIAL_PROMPT_INSTRUCTION: &str = r"
 You're a git commit generator expert.
@@ -24,10 +24,11 @@ Some guidance for generating the commit:
 pub struct InstructionBuilder {}
 
 impl InstructionBuilder {
-	pub fn build(instruction_strategy: Box<dyn InstructionStrategy>) -> String {
+	// pub fn build(instruction_strategy: Box<dyn InstructionStrategy>) -> String {
+	pub fn build(instruction_strategy: &str) -> String {
 		[
 			INITIAL_PROMPT_INSTRUCTION,
-			instruction_strategy.inject(),
+			instruction_strategy,
 			COMMIT_GUIDANCE,
 		]
 		.join("\n")

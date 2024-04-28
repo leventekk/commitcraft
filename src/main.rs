@@ -1,24 +1,19 @@
-use std::time::Duration;
+use std::process;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use executor::Executor;
-use indicatif::ProgressBar;
+use commitcraft::{
+	actions::generate_message::generate_message, executor::Executor, guard::Guard, instructions::{
+		conventional::ConventionalCommitInstructionStrategy,
+		raw::RawCommitInstructionStrategy, InstructionStrategy,
+	}, prelude::Result
+};
 use inquire::Confirm;
-use instruction_builder::InstructionBuilder;
-use instructions::InstructionStrategy;
 use serde_derive::{Deserialize, Serialize};
-use std::fmt::Write;
-
-mod diff_collector;
-mod executor;
-mod instruction_builder;
-mod instructions;
-mod message_generator;
 
 const APP_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-enum Format {
+pub enum Format {
 	/// Conventional commit message
 	Conventional,
 
@@ -57,7 +52,6 @@ struct AppConfig {
 	// add_description: bool,
 }
 
-/// `MyConfig` implements `Default`
 impl ::std::default::Default for AppConfig {
 	fn default() -> Self {
 		Self {
@@ -68,7 +62,7 @@ impl ::std::default::Default for AppConfig {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), confy::ConfyError> {
+async fn main() -> Result<()> {
 	let args = Args::parse();
 	let app_config: AppConfig = confy::load(APP_NAME, None)?;
 
@@ -84,58 +78,26 @@ async fn main() -> Result<(), confy::ConfyError> {
 			println!("Configuration saved.")
 		}
 		None => {
-			if app_config.openai_api_key.is_empty() {
-				eprintln!("OpenAI API key is not set.");
-				std::process::exit(1);
-			}
+            let requirements_check = Guard::check_requirements(&app_config.openai_api_key);
 
-			let instructions_injector: Box<dyn InstructionStrategy> = match args.format {
-                Format::Conventional => Box::new(
-                    instructions::conventional::ConventionalCommitInstructionStrategy,
-                ),
-                Format::Raw => Box::new(instructions::raw::RawCommitInstructionStrategy),
-            };
+            if let Err(e) = requirements_check {
+                eprintln!("{}", e);
+                process::exit(1);
+            }
 
-			let changes = match diff_collector::collect_changes() {
-				Ok(r) => r,
-				Err(e) => {
-					eprintln!("No stashed changes were found: {}", e);
-					std::process::exit(1);
-				}
-			};
+			let message_instructions: Box<dyn InstructionStrategy> =
+				match args.format {
+					Format::Conventional => {
+						Box::new(ConventionalCommitInstructionStrategy)
+					}
+					Format::Raw => Box::new(RawCommitInstructionStrategy),
+				};
 
-			if changes.files.is_empty() {
-				eprintln!("No stashed changes were found");
-				std::process::exit(1);
-			}
-
-			let formatted_list = changes
-				.files
-				.iter()
-				.map(|line| {
-					let mut formatted_line = String::new();
-					writeln!(&mut formatted_line, "- {}", line).unwrap();
-					formatted_line
-				})
-				.collect::<String>();
-
-			println!("Stashed files:\n{:}", formatted_list);
-
-			let progress_bar =
-				ProgressBar::new_spinner().with_message("Generating commit message");
-			progress_bar.enable_steady_tick(Duration::from_millis(120));
-
-			let generated_message = message_generator::generate_message(
+			let generated_message = generate_message(
 				&app_config.openai_api_key,
-				&changes.diff,
-				// TODO: this builder needs a constructor where I can inject the instructions
-				InstructionBuilder::build(instructions_injector),
+				message_instructions.inject(),
 			)
 			.await;
-
-			progress_bar.finish_and_clear();
-
-			println!("Here is the generated commit:\n\n{:}\n", generated_message);
 
 			let message_confirmed = Confirm::new("Do you want to use this message?")
 				.with_default(true)
@@ -143,15 +105,17 @@ async fn main() -> Result<(), confy::ConfyError> {
 
 			match message_confirmed {
 				Ok(true) => {
-					let _ = Executor::confirm_message(&generated_message);
+					let _ = commit_changes(generated_message.as_str());
 				}
-				Ok(false) => {
-					println!("That's too bad, I've heard great things about it.")
-				}
-				Err(_) => println!("Error with questionnaire, try again later"),
+				Ok(false) => {}
+				Err(_) => {},
 			}
 		}
 	}
 
 	Ok(())
+}
+
+fn commit_changes(message: &str) -> Result<String> {
+	Executor::execute(vec!["--no-pager", "commit", "-m", message])
 }

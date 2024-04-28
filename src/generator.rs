@@ -5,8 +5,23 @@ use openai_dive::v1::resources::chat::{
 	ChatMessageContent, Role,
 };
 
+pub struct Generator {}
+
+impl Generator {
+	// we should provide a basic example of how a git diff looks like
+	pub async fn generate_message(
+		api_key: &str,
+		git_diff: &str,
+		// TODO: here we need to inject the builder
+		instructions: &str,
+	) -> Option<String> {
+		let response = execute_request(api_key, instructions, git_diff).await;
+		extract_response_choice(response)
+	}
+}
+
 async fn execute_request(
-    api_key: &str,
+	api_key: &str,
 	system_messge: &str,
 	user_message: &str,
 ) -> ChatCompletionResponse {
@@ -33,10 +48,10 @@ async fn execute_request(
 	client.chat().create(parameters).await.unwrap()
 }
 
-fn prettify_message(message: ChatMessageContent) -> String {
+fn prettify_message(message: ChatMessageContent) -> Option<String> {
 	match message {
-		ChatMessageContent::Text(str) => str,
-		_ => "".to_string(),
+		ChatMessageContent::Text(str) => Some(str),
+		_ => None,
 	}
 }
 
@@ -44,24 +59,8 @@ fn extract_response_choice(response: ChatCompletionResponse) -> Option<String> {
 	response
 		.choices
 		.into_iter()
-		.map(|choice| prettify_message(choice.message.content))
+		.filter_map(|choice| prettify_message(choice.message.content))
 		.collect::<Vec<_>>()
 		.first()
 		.cloned()
-}
-
-// we should provide a basic example of how a git diff looks like
-pub async fn generate_message(
-	api_key: &str,
-	git_diff: &str,
-	// TODO: here we need to inject the builder
-	instructions: String,
-) -> String {
-	let response = execute_request(api_key, &instructions, git_diff).await;
-	let result = extract_response_choice(response);
-
-	match result {
-		Some(val) => val,
-		_ => "".to_string(),
-	}
 }
