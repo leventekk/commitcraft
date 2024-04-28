@@ -2,10 +2,14 @@ use std::process;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use commitcraft::{
-	actions::generate_message::generate_message, executor::Executor, guard::Guard, instructions::{
+	actions::generate_message::generate_message,
+	executor::Executor,
+	guard::Guard,
+	instructions::{
 		conventional::ConventionalCommitInstructionStrategy,
 		raw::RawCommitInstructionStrategy, InstructionStrategy,
-	}, prelude::Result
+	},
+	prelude::Result,
 };
 use inquire::Confirm;
 use serde_derive::{Deserialize, Serialize};
@@ -78,12 +82,13 @@ async fn main() -> Result<()> {
 			println!("Configuration saved.")
 		}
 		None => {
-            let requirements_check = Guard::check_requirements(&app_config.openai_api_key);
+			let requirements_check =
+				Guard::check_requirements(&app_config.openai_api_key);
 
-            if let Err(e) = requirements_check {
-                eprintln!("{}", e);
-                process::exit(1);
-            }
+			if let Err(e) = requirements_check {
+				eprintln!("{}", e);
+				process::exit(1);
+			}
 
 			let message_instructions: Box<dyn InstructionStrategy> =
 				match args.format {
@@ -105,10 +110,12 @@ async fn main() -> Result<()> {
 
 			match message_confirmed {
 				Ok(true) => {
-					let _ = commit_changes(generated_message.as_str());
+					let result = commit_changes(generated_message.as_str())?;
+
+                    println!("{}", result);
 				}
 				Ok(false) => {}
-				Err(_) => {},
+				Err(_) => {}
 			}
 		}
 	}
