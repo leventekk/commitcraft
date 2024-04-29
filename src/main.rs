@@ -26,7 +26,7 @@ pub enum Format {
 }
 
 #[derive(Parser)]
-#[command(version, about, long_about = None)]
+#[command(version, about, arg_required_else_help = true)]
 struct Args {
 	/// Format of the commit message
 	#[arg(short, long, value_enum, default_value = "conventional")]
@@ -44,6 +44,9 @@ enum Commands {
 		#[arg(short, long)]
 		api_key: String,
 	},
+
+	/// Generate a commit message
+	Generate,
 }
 
 // TODO: this should be a separate file
@@ -81,7 +84,7 @@ async fn main() -> Result<()> {
 			confy::store(APP_NAME, None, config)?;
 			println!("Configuration saved.")
 		}
-		None => {
+		Some(Commands::Generate) => {
 			let requirements_check =
 				Guard::check_requirements(&app_config.openai_api_key);
 
@@ -112,12 +115,13 @@ async fn main() -> Result<()> {
 				Ok(true) => {
 					let result = commit_changes(generated_message.as_str())?;
 
-                    println!("{}", result);
+					println!("{}", result);
 				}
 				Ok(false) => {}
 				Err(_) => {}
 			}
 		}
+		None => {}
 	}
 
 	Ok(())

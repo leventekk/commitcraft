@@ -19,6 +19,6 @@ impl Guard {
 	}
 
 	fn check_git_status() -> Result<String> {
-		Executor::execute(vec!["rev-parse", "--is-inside-work-tree"])
+		Executor::execute(vec!["status"])
 	}
 }

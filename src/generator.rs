@@ -8,11 +8,9 @@ use openai_dive::v1::resources::chat::{
 pub struct Generator {}
 
 impl Generator {
-	// we should provide a basic example of how a git diff looks like
 	pub async fn generate_message(
 		api_key: &str,
 		git_diff: &str,
-		// TODO: here we need to inject the builder
 		instructions: &str,
 	) -> Option<String> {
 		let response = execute_request(api_key, instructions, git_diff).await;

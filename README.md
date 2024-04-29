@@ -41,3 +41,9 @@ commitcraft --format conventional
 commitcraft config --api-key <your_api_key>
 ```
 
+
+## Features
+- we need to provide a better UX for settings
+- more options needs to be added to settings, like format, add_description
+- might be worth considering to retrieve the settings
+- file based settings in the home directory (.config/commitcraft)
