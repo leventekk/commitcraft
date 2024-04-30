@@ -11,34 +11,31 @@ CommitCraft is a command-line interface (CLI) application written in Rust, desig
 **Usage:**
 
 ```bash
-commitcraft [--format <format>]
+commitcraft
 ```
 
-**Flags:**  
-- `--format <format>`: Specifies the desired commit format. Accepts values: `raw` or `conventional`. Default is `raw`.
-
 **Commands:**  
+- `generate`: Generates a commit messages.
+  - `--format <format>`: Specifies the desired commit format. Accepts values: `raw` or `conventional`. Default is `raw`.
 - `config`: Configure CommitCraft settings.
   - `--api-key <api_key>`: Set the OpenAI API key for enhanced functionality.
+  - `--add-description <add_description>`: Includes a detailed description into the commit body.
 
 **Examples:**  
 1. Generate a raw format commit:  
 
 ```bash
-commitcraft --format raw
+commitcraft generate --format raw
 ```
 
 2. Generate a conventional commit:  
 
 ```bash
-commitcraft --format conventional
+commitcraft generate --format conventional
 ```
+
 3. Configure CommitCraft with an API key:  
 
 ```bash
 commitcraft config --api-key <your_api_key>
 ```
-
-
-## Features
-- we need to provide a better UX for settings
