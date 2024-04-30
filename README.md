@@ -1,7 +1,5 @@
 # CommitCraft
 
----
-
 **Description:**
 CommitCraft is a command-line interface (CLI) application written in Rust, designed to facilitate the generation of Git commits from stashed changes. With CommitCraft, you can efficiently create Git commits in two distinct formats: raw commit and conventional commit. Whether you prefer a simple, raw format or adhere to the conventional commit standard, CommitCraft has got you covered.
 
@@ -44,6 +42,3 @@ commitcraft config --api-key <your_api_key>
 
 ## Features
 - we need to provide a better UX for settings
-- more options needs to be added to settings, like format, add_description
-- might be worth considering to retrieve the settings
-- file based settings in the home directory (.config/commitcraft)

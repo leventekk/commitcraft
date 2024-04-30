@@ -3,6 +3,9 @@ pub enum Error {
 	#[error("Generic {0}")]
 	Generic(String),
 
+    #[error("CommitMessage {0}")]
+    CommitMessage(String),
+
 	#[error("Guard {0}")]
 	Guard(String),
 
