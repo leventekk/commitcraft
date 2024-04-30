@@ -56,7 +56,7 @@ impl GenerateMessageCommand {
 			})
 			.collect::<String>();
 
-		println!("Stashed files:\n{:}", formatted_list);
+		println!("Files found in the stash:\n{:}", formatted_list);
 
 		let progress_bar =
 			ProgressBar::new_spinner().with_message("Generating commit message");
@@ -84,14 +84,20 @@ impl GenerateMessageCommand {
 
 		progress_bar.finish_and_clear();
 
-		println!("Here is the generated commit:\n\n{:}\n", generated_message);
+		println!("Here is the generated commit message:\n\n{:}\n", generated_message);
 
 		let message_confirmed = Confirm::new("Do you want to use this message?")
 			.with_default(true)
 			.prompt();
 
-		if message_confirmed.is_ok() {
-			let _ = commit_changes(generated_message.as_str())?;
+		match message_confirmed {
+			Ok(true) => {
+				let commit_response = commit_changes(generated_message.as_str())?;
+
+                println!("{}", commit_response);
+			}
+			Ok(false) => {}
+			Err(_) => {}
 		}
 
 		Ok(())
