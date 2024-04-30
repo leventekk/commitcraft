@@ -1,5 +1,3 @@
-// use crate::instructions::InstructionStrategy;
-
 static INITIAL_PROMPT_INSTRUCTION: &str = r"
 You're a git commit generator expert.
 The user provides a `git diff` format for you and your task is to generate a commit message based on the given diff.
@@ -10,8 +8,6 @@ Some guidance for generating the commit:
 - Use the present tense. Lines must not be longer than 74 characters.
 - Do not start the sentences with a capital letter, use small case everywhere
 - Do not add any extra formatting to the commit message
-- Remove the starting and ending backticks and also the new lines
-- Focus on code changes and the reason why those changes were made
 ";
 
 static COMMIT_OPTIONAL_BODY: &str = r"
@@ -22,19 +18,24 @@ static COMMIT_OPTIONAL_BODY: &str = r"
 - fixed a bug when the list is empty
 ```
 - If there is only one item that can be listed in the [optional body] you can write it as a sentence, no need to use a dash
+- Focus on code changes and the reason why those changes were made
+- Remove the starting and ending backticks and also the new lines
 ";
 
 pub struct InstructionBuilder {}
 
 impl InstructionBuilder {
-	// pub fn build(instruction_strategy: Box<dyn InstructionStrategy>) -> String {
-	pub fn build(instruction_strategy: &str) -> String {
-		[
+	pub fn build(instruction_strategy: &str, with_description: &bool) -> String {
+		let mut instructions = vec![
 			INITIAL_PROMPT_INSTRUCTION,
 			instruction_strategy,
 			COMMIT_GUIDANCE,
-            COMMIT_OPTIONAL_BODY,
-		]
-		.join("\n")
+		];
+
+		if *with_description {
+			instructions.push(COMMIT_OPTIONAL_BODY);
+		}
+
+		instructions.join("\n")
 	}
 }

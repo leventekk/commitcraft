@@ -24,6 +24,7 @@ pub struct GenerateMessageCommand {}
 impl GenerateMessageCommand {
 	pub async fn generate_message(
 		openai_api_key: &str,
+        with_description: &bool,
 		format: &Format,
 	) -> Result<()> {
 		let requirements_check = Guard::check_requirements(openai_api_key);
@@ -70,7 +71,7 @@ impl GenerateMessageCommand {
 		let generated_message = match Generator::generate_message(
 			openai_api_key,
 			&collected_changes.diff,
-			InstructionBuilder::build(message_instructions).as_str(),
+			InstructionBuilder::build(message_instructions, with_description).as_str(),
 		)
 		.await
 		{

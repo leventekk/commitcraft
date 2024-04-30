@@ -52,6 +52,7 @@ async fn main() -> Result<()> {
 		Some(Commands::Generate { format }) => {
 			let _ = GenerateMessageCommand::generate_message(
 				&app_config.openai_api_key,
+                &app_config.add_description,
 				format,
 			)
 			.await;
