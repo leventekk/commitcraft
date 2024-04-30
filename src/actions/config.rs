@@ -1,8 +1,8 @@
 use clap::ValueEnum;
+use console::style;
 use serde_derive::{Deserialize, Serialize};
 
 use crate::prelude::Result;
-use colored::Colorize;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Format {
@@ -60,7 +60,9 @@ impl ConfigCommand {
 		}
 
 		if stored_config == updated_config {
-			println!("{}", "No changes were made.".yellow());
+            println!("{}\n", style("No changes were made.").yellow().bold());
+
+            println!("{}", style("But here is the stored configuration:").bold());
 			println!("{:#?}", stored_config);
 
 			return Ok(false);

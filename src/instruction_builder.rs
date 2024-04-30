@@ -8,7 +8,7 @@ Some guidance for generating the commit:
 - Use the present tense. Lines must not be longer than 74 characters.
 - Do not start the sentences with a capital letter, use small case everywhere
 - Do not add any extra formatting to the commit message
-- Use the filenames in the diff to provide context
+- Do not include multiple messages with the same meaning
 ";
 
 static COMMIT_OPTIONAL_BODY: &str = r"

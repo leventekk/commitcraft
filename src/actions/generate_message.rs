@@ -14,7 +14,7 @@ use crate::{
 	},
 	prelude::{Error, Result},
 };
-use colored::Colorize;
+use console::style;
 use indicatif::ProgressBar;
 use inquire::Confirm;
 use std::fmt::Write;
@@ -24,13 +24,13 @@ pub struct GenerateMessageCommand {}
 impl GenerateMessageCommand {
 	pub async fn generate_message(
 		openai_api_key: &str,
-        with_description: &bool,
+		with_description: &bool,
 		format: &Format,
 	) -> Result<()> {
 		let requirements_check = Guard::check_requirements(openai_api_key);
 
 		if let Err(error) = requirements_check {
-			eprintln!("{}", error.to_string().red());
+			eprintln!("{}", style(error.to_string()).red());
 			process::exit(1);
 		}
 
@@ -42,7 +42,7 @@ impl GenerateMessageCommand {
 			// 	message: "No stashed changes were found".to_string().yellow(),
 			// });
 
-			println!("{}", "No stashed changes were found".yellow());
+			println!("{}", style("No stashed changes were found").bold().yellow());
 
 			process::exit(1);
 		}
@@ -57,7 +57,11 @@ impl GenerateMessageCommand {
 			})
 			.collect::<String>();
 
-		println!("Files found in the stash:\n{:}", formatted_list);
+		println!(
+			"{}\n{:}",
+			style("Files found in the stash").bold().dim(),
+			style(formatted_list).dim()
+		);
 
 		let progress_bar =
 			ProgressBar::new_spinner().with_message("Generating commit message");
@@ -71,7 +75,8 @@ impl GenerateMessageCommand {
 		let generated_message = match Generator::generate_message(
 			openai_api_key,
 			&collected_changes.diff,
-			InstructionBuilder::build(message_instructions, with_description).as_str(),
+			InstructionBuilder::build(message_instructions, with_description)
+				.as_str(),
 		)
 		.await
 		{
@@ -85,7 +90,10 @@ impl GenerateMessageCommand {
 
 		progress_bar.finish_and_clear();
 
-		println!("Here is the generated commit message:\n\n{:}\n", generated_message);
+		println!(
+			"Here is the generated commit message:\n\n{:}\n",
+			generated_message
+		);
 
 		let message_confirmed = Confirm::new("Do you want to use this message?")
 			.with_default(true)
@@ -95,7 +103,7 @@ impl GenerateMessageCommand {
 			Ok(true) => {
 				let commit_response = commit_changes(generated_message.as_str())?;
 
-                println!("{}", commit_response);
+				println!("{}", commit_response);
 			}
 			Ok(false) => {}
 			Err(_) => {}
