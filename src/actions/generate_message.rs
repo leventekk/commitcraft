@@ -103,7 +103,7 @@ impl GenerateMessageCommand {
 			Ok(true) => {
 				let commit_response = commit_changes(generated_message.as_str())?;
 
-				println!("{}", commit_response);
+				println!("\n\n{}", commit_response);
 			}
 			Ok(false) => {}
 			Err(_) => {}
