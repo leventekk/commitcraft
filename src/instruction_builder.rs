@@ -9,6 +9,7 @@ Some guidance for generating the commit:
 - Do not start the sentences with a capital letter, use small case everywhere
 - Do not add any extra formatting to the commit message
 - Do not include multiple messages with the same meaning
+- Remove the starting and ending backticks and also the new lines
 ";
 
 static COMMIT_OPTIONAL_BODY: &str = r"
@@ -20,7 +21,6 @@ static COMMIT_OPTIONAL_BODY: &str = r"
 ```
 - If there is only one item that can be listed in the [optional body] you can write it as a sentence, no need to use a dash
 - Focus on code changes and the reason why those changes were made
-- Remove the starting and ending backticks and also the new lines
 ";
 
 pub struct InstructionBuilder {}
