@@ -45,6 +45,9 @@ A BREAKING CHANGE can be part of commits of any _type_.
 
 Additional types are not mandated by the Conventional Commits specification, and have no implicit effect in Semantic Versioning (unless they include a BREAKING CHANGE).
 <br /><br />
-A scope may be provided to a commit's type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add the ability to parse arrays`."
+A scope may be provided to a commit's type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add the ability to parse arrays`.
+
+You cannot add multiple semantic commit messages in a single commit. If you have multiple changes, please include it into the body.
+"
 	}
 }
