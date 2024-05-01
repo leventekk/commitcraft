@@ -3,15 +3,22 @@ use crate::instructions::InstructionStrategy;
 pub struct RawCommitInstructionStrategy;
 
 impl InstructionStrategy for RawCommitInstructionStrategy {
-	fn inject() -> &'static str {
-		r"You suggest a commit message. Don't add anything else to the response.
+	fn inject(with_description: &bool) -> String {
+		format!(
+			r"
+You suggest a commit message. Don't add anything else to the response.
+The commit message should be structured as follows:
 
-        The commit message should be structured as follows:
+<description>
 
-        <description>
+{}
 
-        [optional body]
-
-        [optional footer(s)]"
+[optional footer(s)]",
+			if *with_description {
+				"[optional body]"
+			} else {
+				""
+			}
+		)
 	}
 }

@@ -1,42 +1,37 @@
-static INITIAL_PROMPT_INSTRUCTION: &str = r"
-You're a git commit generator expert.
-The user provides a `git diff` format for you and your task is to generate a commit message based on the given diff.
-";
-
-static COMMIT_GUIDANCE: &str = r"
-Some guidance for generating the commit:
-- Use the present tense. Lines must not be longer than 74 characters.
-- Do not start the sentences with a capital letter, use small case everywhere
-- Do not add any extra formatting to the commit message
-- Do not include multiple messages with the same meaning
-- Remove the starting and ending backticks and also the new lines
-";
-
-static COMMIT_OPTIONAL_BODY: &str = r"
-- As for the [optional body], you can include all the changes that cannot fit into the <description>
-- If you're using a list to mention all of the changes in the [optional body], for example:
-```
-- added a new feature called list items
-- fixed a bug when the list is empty
-```
-- If there is only one item that can be listed in the [optional body] you can write it as a sentence, no need to use a dash
-- Focus on code changes and the reason why those changes were made
-";
-
 pub struct InstructionBuilder {}
 
 impl InstructionBuilder {
 	pub fn build(instruction_strategy: &str, with_description: &bool) -> String {
-		let mut instructions = vec![
-			INITIAL_PROMPT_INSTRUCTION,
+		format!("
+### instructions ###
+
+Act as a professional developer and text analyst, who can deliver its best in parsing Git diff.
+
+The user will provide you a Git diff file, and you will have to parse it and extract the following information:
+- What is the filename?
+- What changes were made in the related file? You should summarize the changes in a few sentences.
+
+When summarizing the changes, you should not include the actual code changes, but the context of the changes.
+
+### examples ###
+
+Here are some examples of the input given by the user and the desired output you should build.
+
+{}
+
+### output rules ###
+
+In the response, please use present tense and do not exceed 74 characters per line.
+Please do not include the given examples in the output.
+Please exclude any markdown formatting in the response.
+{}
+        ",
 			instruction_strategy,
-			COMMIT_GUIDANCE,
-		];
-
-		if *with_description {
-			instructions.push(COMMIT_OPTIONAL_BODY);
-		}
-
-		instructions.join("\n")
+            if *with_description {
+                "Please include a summarized list of changes separated by - in the commit body, but for each item be concise and focus on why the change was made."
+            } else {
+                "Please do not add any changes to the commit body."
+            }
+		)
 	}
 }

@@ -66,15 +66,15 @@ impl GenerateMessageCommand {
 
 		progress_bar.enable_steady_tick(Duration::from_millis(120));
 
-		let message_instructions: &str = match format {
-			Format::Conventional => ConventionalCommitInstructionStrategy::inject(),
-			Format::Raw => RawCommitInstructionStrategy::inject(),
+		let message_instructions: String = match format {
+			Format::Conventional => ConventionalCommitInstructionStrategy::inject(with_description),
+			Format::Raw => RawCommitInstructionStrategy::inject(with_description),
 		};
 
 		let generated_message = match Generator::generate_message(
 			openai_api_key,
 			&collected_changes.diff,
-			InstructionBuilder::build(message_instructions, with_description)
+			InstructionBuilder::build(message_instructions.as_str(), with_description)
 				.as_str(),
 		)
 		.await

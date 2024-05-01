@@ -3,51 +3,178 @@ use crate::instructions::InstructionStrategy;
 pub struct ConventionalCommitInstructionStrategy;
 
 impl InstructionStrategy for ConventionalCommitInstructionStrategy {
-	fn inject() -> &'static str {
-		r"
-You suggest a conventional commit message. Don't add anything else to the response. The following describes conventional commits.
+	fn inject(with_description: &bool) -> String {
+		let examples = r###"
+#### example 1 ####
 
-# Conventional Commits 1.0.0
-
-## Summary
-
-The Conventional Commits specification is a lightweight convention on top of commit messages.
-It provides an easy set of rules for creating an explicit commit history;
-which makes it easier to write automated tools on top of.
-This convention dovetails with [SemVer](http://semver.org),
-by describing the features, fixes, and breaking changes made in commit messages.
-
-The commit message should be structured as follows:
-
----
-
+##### input #####
 ```
-<type>[optional scope]: <description>
+diff --git a/src/guard.rs b/src/guard.rs
+index 563d47d..44c3624 100644
+--- a/src/guard.rs
++++ b/src/guard.rs
+@@ -8,7 +8,7 @@ pub struct Guard {}
+ impl Guard {
+ pub fn check_requirements(api_key: &str) -> Result<()> {
+   if api_key.is_empty() {
+-    return Err(Error::Guard("API key is set".to_string()));
++    return Err(Error::Guard("API key is not set".to_string()));
+   }
 
-[optional body]
-
-[optional footer(s)]
+   if Guard::check_git_status().is_err() {
 ```
----
 
+##### output #####
+```
+fix(guard): change error message when API key is not set
+```
 
-The commit contains the following structural elements, to communicate intent to the
-consumers of your library:
+#### example 2 ####
 
-1. **fix:** a commit of the _type_ `fix` patches a bug in your codebase (this correlates with [`PATCH`](http://semver.org/#summary) in Semantic Versioning).
-1. **feat:** a commit of the _type_ `feat` introduces a new feature to the codebase (this correlates with [`MINOR`](http://semver.org/#summary) in Semantic Versioning).
-1. **BREAKING CHANGE:** a commit that has a footer `BREAKING CHANGE:`, or appends a `!` after the type/scope, introduces a breaking API change (correlating with [`MAJOR`](http://semver.org/#summary) in Semantic Versioning).
-A BREAKING CHANGE can be part of commits of any _type_.
-1. _types_ other than `fix:` and `feat:` are allowed, for example [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional) (based on the [Angular convention](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines)) recommends `build:`, `chore:`,
-  `ci:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, and others.
-1. _footers_ other than `BREAKING CHANGE: <description>` may be provided and follow a convention similar to
-  [git trailer format](https://git-scm.com/docs/git-interpret-trailers).
+##### input #####
+```
+diff --git a/src/main.rs b/src/main.rs
+index 1234567..abcdefg 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -1,8 +1,11 @@
++use std::time::Duration;
+ use tokio::time::delay_for;
+ 
+ #[tokio::main]
+ async fn main() {
+-    println!("Hello, world!");
++    let message = String::from("Hello, world!");
++    let msg_ref = &message;
++    println!("{}", msg_ref);
++    await!(example_async_function()).unwrap();
+ }
 
-Additional types are not mandated by the Conventional Commits specification, and have no implicit effect in Semantic Versioning (unless they include a BREAKING CHANGE).
-<br /><br />
-A scope may be provided to a commit's type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add the ability to parse arrays`.
+diff --git a/src/lib.rs b/src/lib.rs
+index 9876543..fedcba9 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -1,5 +1,10 @@
++use tokio::time::Duration;
++use tokio::task;
++
+ pub async fn fetch_contacts_from_database() -> Result<(), Box<dyn std::error::Error>> {
+-    println!("Welcome to the Rust world!");
+-    Ok(())
++    task::spawn(async {
++        delay_for(Duration::from_secs(1)).await;
++        println!("Async function executed!");
++    }).await?;
++    Ok(())
+}
+```
 
-You cannot add multiple semantic commit messages in a single commit. If you have multiple changes, please include it into the body.
-"
+##### output #####
+```
+feat(async): introduce tokio to handle async functions
+```
+
+#### example 3 ####
+
+##### input #####
+```
+diff --git a/src/generator.rs b/src/generator.rs
+index d0b8d79..2e33472 100644
+--- a/src/generator.rs
++++ b/src/generator.rs
+@@ -39,7 +39,7 @@ async fn execute_request(
+ 				..Default::default()
+ 			},
+ 		],
+-		temperature: Some(0.2),
++		temperature: Some(0.1),
+ 		..Default::default()
+ 	};
+ 
+diff --git a/src/instruction_builder.rs b/src/instruction_builder.rs
+index ce88e08..e261cef 100644
+--- a/src/instruction_builder.rs
++++ b/src/instruction_builder.rs
+@@ -1,42 +1,33 @@
+-static INITIAL_PROMPT_INSTRUCTION: &str = r"
+-";
+-
+-static COMMIT_GUIDANCE: &str = r"
+-";
+-
+-static COMMIT_OPTIONAL_BODY: &str = r"
+-";
+-
+ pub struct InstructionBuilder {}
+ 
+ impl InstructionBuilder {
+ 	pub fn build(instruction_strategy: &str, with_description: &bool) -> String {
+-		let mut instructions = vec![
+-			INITIAL_PROMPT_INSTRUCTION,
+-			instruction_strategy,
+-			COMMIT_GUIDANCE,
+-		];
++		format!("
+ 
+-		if *with_description {
+-			instructions.push(COMMIT_OPTIONAL_BODY);
+-		}
+-		instructions.join("\n")
++
++        ",
++			instruction_strategy,
++            if *with_description {
++                "Your software should handle this case in order to function properly"
++            } else {
++                ""
++            }
++		)
+ 	}
+ }
+diff --git a/src/instructions/conventional.rs b/src/instructions/conventional.rs
+index 6ef593a..e1c8bee 100644
+--- a/src/instructions/conventional.rs
++++ b/src/instructions/conventional.rs
+@@ -4,50 +4,86 @@ pub struct ConventionalCommitInstructionStrategy;
+ 
+ impl InstructionStrategy for ConventionalCommitInstructionStrategy {
+ 	fn inject() -> &'static str {
+-		r"
+-# Conventional Commits 1.0.0
++Here are some examples of the input and output of the program:
+ 	}
+ }
+```
+
+##### output #####
+"###;
+
+		let closing_details = format!(
+			r###"
+```
+feat(generator): improve conventional commit generation prompt
+
+{}
+```
+### examples end ###
+
+### output details ###
+
+You should respond with a conventional commit message, which is a short and concise description of the changes made in the file.
+You can find the definition of a conventional commit message here: https://www.conventionalcommits.org/en/v1.0.0/
+Here are the allowed types that you can use: feat, fix, docs, style, refactor, test, chore, perf, ci
+When defining the scope, please use the context of the changes of the code, but keep it short and concise, like 'parser', 'lexer', 'compiler', etc, and lowercase.
+            "###,
+			if *with_description {
+				r#"
+- Reduce sampling temperature value to get more precise response
+- Improve the initial prompt instruction to be more descriptive
+                "#
+			} else {
+				""
+			},
+		);
+
+		format!("{}{}", examples, closing_details)
 	}
 }
