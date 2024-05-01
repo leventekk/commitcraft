@@ -8,8 +8,8 @@ use commitcraft::{
 };
 
 #[derive(Parser)]
-#[command(version, about, long_about = None, arg_required_else_help = true)]
-struct Args {
+#[command(version, about = "A commit generator CLI", long_about = None, arg_required_else_help = true)]
+struct Cli {
 	#[command(subcommand)]
 	command: Option<Commands>,
 }
@@ -38,8 +38,9 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
 	let app_config: AppConfig = ConfigCommand::load()?;
+    let args = Cli::parse();
 
-	match &Args::parse().command {
+	match args.command {
 		Some(Commands::Config {
 			api_key,
 			add_description,
@@ -52,8 +53,8 @@ async fn main() -> Result<()> {
 		Some(Commands::Generate { format }) => {
 			let _ = GenerateMessageCommand::generate_message(
 				&app_config.openai_api_key,
-                &app_config.add_description,
-				format,
+				&app_config.add_description,
+				&format,
 			)
 			.await;
 		}

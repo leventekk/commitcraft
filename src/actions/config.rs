@@ -1,3 +1,5 @@
+use std::cmp::max;
+
 use clap::ValueEnum;
 use console::style;
 use serde_derive::{Deserialize, Serialize};
@@ -13,7 +15,7 @@ pub enum Format {
 	Raw,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
 	pub openai_api_key: String,
 	pub add_description: bool,
@@ -50,29 +52,42 @@ impl ConfigCommand {
 			openai_api_key: stored_config.openai_api_key.to_string(),
 			..stored_config
 		};
+		let mut has_changed = false;
 
 		if let Some(api_key) = parameters.api_key {
 			updated_config.openai_api_key = api_key;
+			has_changed = true;
 		}
 
 		if let Some(add_description) = parameters.add_description {
 			updated_config.add_description = add_description;
+			has_changed = true;
 		}
 
-		if stored_config == updated_config {
-            println!("{}\n", style("No changes were made.").yellow().bold());
+		if !has_changed {
+			let separator =
+				"=".repeat(max(updated_config.openai_api_key.len(), 5) + 25);
 
-            println!("{}", style("But here is the stored configuration:").bold());
-			println!("{:#?}", stored_config);
+			println!(
+				"Stored Settings:\n{}\n{}{}\n{}{}\n{}",
+				separator,
+				style("  OpenAI API key:   ").bold(),
+				&stored_config.openai_api_key,
+				style("  Add description:  ").bold(),
+				&stored_config.add_description,
+				separator
+			);
 
 			return Ok(false);
 		}
 
 		confy::store(APP_NAME, None, updated_config)?;
 
-		println!("Configuration saved.");
+		println!(
+			"{} Settings have been updated.",
+			style("success").green().bold()
+		);
 
 		Ok(true)
 	}
-	pub fn retrieve_config() {}
 }

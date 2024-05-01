@@ -12,7 +12,7 @@ use crate::{
 		conventional::ConventionalCommitInstructionStrategy,
 		raw::RawCommitInstructionStrategy, InstructionStrategy,
 	},
-	prelude::{Error, Result},
+	prelude::Result,
 };
 use console::style;
 use indicatif::ProgressBar;
@@ -30,19 +30,17 @@ impl GenerateMessageCommand {
 		let requirements_check = Guard::check_requirements(openai_api_key);
 
 		if let Err(error) = requirements_check {
-			eprintln!("{}", style(error.to_string()).red());
+			eprintln!("{} {}", style("error").red().bold(), error);
 			process::exit(1);
 		}
 
 		let collected_changes = Collector::collect_changes()?;
 
 		if collected_changes.files.is_empty() {
-			// return Ok(MessageResponse {
-			// 	files: None,
-			// 	message: "No stashed changes were found".to_string().yellow(),
-			// });
-
-			println!("{}", style("No stashed changes were found").bold().yellow());
+			println!(
+				"{} No stashed files were found.",
+				style("info").blue().bold()
+			);
 
 			process::exit(1);
 		}
@@ -65,6 +63,7 @@ impl GenerateMessageCommand {
 
 		let progress_bar =
 			ProgressBar::new_spinner().with_message("Generating commit message");
+
 		progress_bar.enable_steady_tick(Duration::from_millis(120));
 
 		let message_instructions: &str = match format {
@@ -82,16 +81,19 @@ impl GenerateMessageCommand {
 		{
 			Some(m) => m,
 			None => {
-				return Err(Error::CommitMessage(
-					"Failed to generate commit message".to_string(),
-				));
+				println!(
+					"{} Failed to generate commit message",
+					style("error").red().bold()
+				);
+				process::exit(1);
 			}
 		};
 
 		progress_bar.finish_and_clear();
 
 		println!(
-			"Here is the generated commit message:\n\n{:}\n",
+			"{} Here is the generated message:\n{}",
+			style("info").green().bold(),
 			generated_message
 		);
 
