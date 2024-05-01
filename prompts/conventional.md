@@ -1,10 +1,17 @@
-use crate::instructions::InstructionStrategy;
+### instructions ###
 
-pub struct ConventionalCommitInstructionStrategy;
+Act as a professional developer and text analyst, who can deliver its best in parsing Git diff.
 
-impl InstructionStrategy for ConventionalCommitInstructionStrategy {
-	fn inject(with_description: &bool) -> String {
-		let examples = r###"
+The user will provide you a Git diff file, and you will have to parse it and extract the following information:
+- What is the filename?
+- What changes were made in the related file? You should summarize the changes in a few sentences.
+
+When summarizing the changes, you should not include the actual code changes, but the context of the changes.
+
+### examples start ###
+
+Here are some examples of the input given by the user and the desired output you should build. 
+
 #### example 1 ####
 
 ##### input #####
@@ -27,6 +34,7 @@ index 563d47d..44c3624 100644
 ##### output #####
 
 fix(guard): change error message when API key is not set
+
 
 #### example 2 ####
 
@@ -71,6 +79,7 @@ index 9876543..fedcba9 100644
 ##### output #####
 
 feat(async): introduce tokio to handle async functions
+
 
 #### example 3 ####
 
@@ -145,14 +154,11 @@ index 6ef593a..e1c8bee 100644
 ```
 
 ##### output #####
-"###;
 
-		let closing_details = format!(
-			r###"
 feat(generator): improve conventional commit generation prompt
 
-{}
-
+- Reduce sampling temperature value to get more precise response
+- Improve the initial prompt instruction to be more descriptive
 
 ### examples end ###
 
@@ -162,17 +168,10 @@ You should respond with a conventional commit message, which is a short and conc
 You can find the definition of a conventional commit message here: https://www.conventionalcommits.org/en/v1.0.0/
 Here are the allowed types that you can use: feat, fix, docs, style, refactor, test, chore, perf, ci
 When defining the scope, please use the context of the changes of the code, but keep it short and concise, like 'parser', 'lexer', 'compiler', etc, and lowercase.
-            "###,
-			if *with_description {
-				r#"
-- Reduce sampling temperature value to get more precise response
-- Improve the initial prompt instruction to be more descriptive
-                "#
-			} else {
-				""
-			},
-		);
 
-		format!("{}{}", examples, closing_details)
-	}
-}
+### output rules ###
+
+In the response, please use present tense and do not exceed 74 characters per line.
+Please do not include the given examples in the output.
+Please exclude any markdown formatting in the response.
+Please include a summarized list of changes separated by - in the commit body, but for each item be concise and focus on why the change was made.
