@@ -23,7 +23,7 @@ Here are some examples of the input given by the user and the desired output you
 ### output rules ###
 
 In the response, please use present tense and do not exceed 74 characters per line.
-Please do not include any example in the output.
+Do not include the found diffs under the examples section when generating a message.
 Output only plain text. Do not output markdown.
 {}
         ",
