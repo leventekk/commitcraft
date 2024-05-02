@@ -108,9 +108,16 @@ impl GenerateMessageCommand {
 
 		match message_confirmed {
 			Ok(true) => {
-				let commit_response = commit_changes(generated_message.as_str())?;
+				let commit_response = commit_changes(generated_message.as_str());
 
-				println!("\n{}", commit_response);
+				match commit_response {
+					Ok(message) => {
+						println!("{} {}", style("success").green().bold(), message)
+					}
+					Err(error) => {
+						eprintln!("{} {}", style("error").red().bold(), error)
+					}
+				}
 			}
 			Ok(false) => {}
 			Err(_) => {}

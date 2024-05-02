@@ -24,6 +24,7 @@ Here are some examples of the input given by the user and the desired output you
 
 In the response, please use present tense and do not exceed 74 characters per line.
 Do not include the found diffs under the examples section when generating a message.
+If the given input is just a new file without any changes, output the filename and that the file was added.
 Output only plain text. Do not output markdown.
 {}
         ",

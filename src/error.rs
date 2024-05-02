@@ -6,6 +6,9 @@ pub enum Error {
 	#[error("Guard {0}")]
 	Guard(String),
 
+	#[error("{0}")]
+	Executor(String),
+
 	#[error(transparent)]
 	IO(#[from] std::io::Error),
 
