@@ -38,7 +38,7 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
 	let app_config: AppConfig = ConfigCommand::load()?;
-    let args = Cli::parse();
+	let args = Cli::parse();
 
 	match args.command {
 		Some(Commands::Config {

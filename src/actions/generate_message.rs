@@ -36,7 +36,7 @@ impl GenerateMessageCommand {
 
 		let collected_changes = Collector::collect_changes()?;
 
-		if collected_changes.files.is_empty() {
+		if collected_changes.diff.is_empty() {
 			println!(
 				"{} No stashed files were found.",
 				style("info").blue().bold()
