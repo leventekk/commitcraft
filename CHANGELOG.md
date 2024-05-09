@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.4] - 2024-05-09
+### :sparkles: New Features
+- [`260ac70`](https://github.com/leventekk/commitcraft/commit/260ac70fc2eb273e3dffbf4b63ce71fa55693628) - **actions**: add backup functionality to recover and destroy commit messages *(commit by [@leventekk](https://github.com/leventekk))*
+- [`98d07fc`](https://github.com/leventekk/commitcraft/commit/98d07fc708cc060997d2370adfe0186cc3b07c15) - **package**: update commitcraft to version 0.9.4 *(commit by [@leventekk](https://github.com/leventekk))*
+
+
 ## [v0.9.3] - 2024-05-03
 ### :sparkles: New Features
 - [`e28a00d`](https://github.com/leventekk/commitcraft/commit/e28a00d111623f66a7e481929c6693229092a031) - **actions**: add the ability to track changes in the configuration *(commit by [@leventekk](https://github.com/leventekk))*
@@ -32,3 +38,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.9.1]: https://github.com/leventekk/commitcraft/compare/v0.9.0...v0.9.1
 [v0.9.2]: https://github.com/leventekk/commitcraft/compare/v0.9.1...v0.9.2
 [v0.9.3]: https://github.com/leventekk/commitcraft/compare/v0.9.2...v0.9.3
+[v0.9.4]: https://github.com/leventekk/commitcraft/compare/v0.9.3...v0.9.4
