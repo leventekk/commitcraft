@@ -3,6 +3,7 @@ use std::time::Duration;
 
 use crate::{
 	actions::config::Format,
+	backup::Backup,
 	collector::Collector,
 	executor::Executor,
 	generator::Generator,
@@ -61,17 +62,42 @@ impl GenerateMessageCommand {
 			style(formatted_list).dim()
 		);
 
-		let progress_bar =
-			ProgressBar::new_spinner().with_message("Generating commit message");
-
-		progress_bar.enable_steady_tick(Duration::from_millis(120));
-
 		let message_instructions: String = match format {
 			Format::Conventional => {
 				ConventionalCommitInstructionStrategy::inject(with_description)
 			}
 			Format::Raw => RawCommitInstructionStrategy::inject(with_description),
 		};
+
+		let recovered_message = Backup::recover()?;
+
+		if !recovered_message.is_empty() {
+			println!(
+				"{} Seems like there is a recovered message:\n{}",
+				style("info").green().bold(),
+				recovered_message
+			);
+
+			let message_confirmed =
+				Confirm::new("Do you want to reuse this message?")
+					.with_default(true)
+					.prompt();
+
+			if let Ok(true) = message_confirmed {
+				execute_commit(recovered_message.as_str());
+
+				return Ok(());
+			}
+
+			if let Ok(false) = message_confirmed {
+				Backup::destroy()?;
+			}
+		}
+
+		let progress_bar =
+			ProgressBar::new_spinner().with_message("Generating commit message");
+
+		progress_bar.enable_steady_tick(Duration::from_millis(120));
 
 		let generated_message = match Generator::generate_message(
 			openai_api_key,
@@ -108,22 +134,33 @@ impl GenerateMessageCommand {
 
 		match message_confirmed {
 			Ok(true) => {
-				let commit_response = commit_changes(generated_message.as_str());
-
-				match commit_response {
-					Ok(message) => {
-						println!("{} {}", style("success").green().bold(), message)
-					}
-					Err(error) => {
-						eprintln!("{} {}", style("error").red().bold(), error)
-					}
-				}
+				execute_commit(generated_message.as_str());
 			}
 			Ok(false) => {}
 			Err(_) => {}
 		}
 
 		Ok(())
+	}
+}
+
+fn execute_commit(message: &str) {
+	let commit_response = commit_changes(message);
+
+	match commit_response {
+		Ok(message) => {
+			let _ = Backup::destroy();
+			println!("{} {}", style("success").green().bold(), message)
+		}
+		Err(error) => {
+			let commit = Backup::commit(message);
+
+			if commit.is_err() {
+				eprintln!("{} Failed to crate a backup", style("error").red().bold(),)
+			}
+
+			eprintln!("{} {}", style("error").red().bold(), error)
+		}
 	}
 }
 

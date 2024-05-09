@@ -10,3 +10,4 @@ pub mod generator;
 pub mod guard;
 pub mod instruction_builder;
 pub mod instructions;
+pub mod backup;
