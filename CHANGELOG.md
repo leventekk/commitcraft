@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.5] - 2024-05-16
+### :sparkles: New Features
+- [`ac1973c`](https://github.com/leventekk/commitcraft/commit/ac1973cf1e1ec27d26340c5c82bcc7c5a338e5c2) - **config**: remove add_description field and related functionality from AppConfig and ConfigOptions *(commit by [@leventekk](https://github.com/leventekk))*
+- [`57013cd`](https://github.com/leventekk/commitcraft/commit/57013cdda3281d733b3583aff276e767afebfcf0) - **readme**: add CommitCraft logo and update description *(commit by [@leventekk](https://github.com/leventekk))*
+- [`50f1853`](https://github.com/leventekk/commitcraft/commit/50f185357979eeeeafa99da1a66f11a28551731c) - **commitcraft**: update version to 0.9.5 in Cargo.toml and Cargo.lock *(commit by [@leventekk](https://github.com/leventekk))*
+
+### :bug: Bug Fixes
+- [`9dc7963`](https://github.com/leventekk/commitcraft/commit/9dc796398c2be6ba0589bc9e599cfe9c887feddc) - **generator**: handle error response from API when generating message *(commit by [@leventekk](https://github.com/leventekk))*
+
+
 ## [v0.9.4] - 2024-05-09
 ### :sparkles: New Features
 - [`260ac70`](https://github.com/leventekk/commitcraft/commit/260ac70fc2eb273e3dffbf4b63ce71fa55693628) - **actions**: add backup functionality to recover and destroy commit messages *(commit by [@leventekk](https://github.com/leventekk))*
@@ -39,3 +49,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.9.2]: https://github.com/leventekk/commitcraft/compare/v0.9.1...v0.9.2
 [v0.9.3]: https://github.com/leventekk/commitcraft/compare/v0.9.2...v0.9.3
 [v0.9.4]: https://github.com/leventekk/commitcraft/compare/v0.9.3...v0.9.4
+[v0.9.5]: https://github.com/leventekk/commitcraft/compare/v0.9.4...v0.9.5
