@@ -110,11 +110,12 @@ impl GenerateMessageCommand {
 		)
 		.await
 		{
-			Some(m) => m,
-			None => {
+			Ok(m) => m,
+			Err(message) => {
 				println!(
-					"{} Failed to generate commit message",
-					style("error").red().bold()
+					"{} Failed to generate commit message: {}",
+					style("error").red().bold(),
+                    message
 				);
 				process::exit(1);
 			}

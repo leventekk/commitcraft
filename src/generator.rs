@@ -1,20 +1,38 @@
 use openai_dive::v1::api::Client;
+use openai_dive::v1::error::APIError;
 use openai_dive::v1::models::Gpt35Engine;
 use openai_dive::v1::resources::chat::{
 	ChatCompletionParameters, ChatCompletionResponse, ChatMessage,
 	ChatMessageContent, Role,
 };
+use serde::Deserialize;
 
 pub struct Generator {}
+
+#[derive(Debug, Deserialize)]
+struct RequestError {
+	message: String,
+}
 
 impl Generator {
 	pub async fn generate_message(
 		api_key: &str,
 		git_diff: &str,
 		instructions: &str,
-	) -> Option<String> {
+	) -> Result<String, String> {
 		let response = execute_request(api_key, instructions, git_diff).await;
-		extract_response_choice(response)
+
+		match response {
+			Ok(response) => {
+				Ok(extract_response_choice(response).unwrap_or_default())
+			}
+			Err(error) => {
+				let v =
+					serde_json::from_str::<RequestError>(&error.to_string()).unwrap();
+
+				Err(v.message)
+			}
+		}
 	}
 }
 
@@ -22,7 +40,7 @@ async fn execute_request(
 	api_key: &str,
 	system_messge: &str,
 	user_message: &str,
-) -> ChatCompletionResponse {
+) -> Result<ChatCompletionResponse, APIError> {
 	let client = Client::new(api_key.to_string());
 
 	let parameters = ChatCompletionParameters {
@@ -43,7 +61,7 @@ async fn execute_request(
 		..Default::default()
 	};
 
-	client.chat().create(parameters).await.unwrap()
+	client.chat().create(parameters).await
 }
 
 fn prettify_message(message: ChatMessageContent) -> Option<String> {
