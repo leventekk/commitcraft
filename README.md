@@ -1,41 +1,58 @@
+<p align="center" width="100%">
+  <img src="assets/logo.png" alt="CommitCraft" />
+</p>
+
 # CommitCraft
 
-**Description:**
-CommitCraft is a command-line interface (CLI) application written in Rust, designed to facilitate the generation of Git commits from stashed changes. With CommitCraft, you can efficiently create Git commits in two distinct formats: raw commit and conventional commit. Whether you prefer a simple, raw format or adhere to the conventional commit standard, CommitCraft has got you covered.
+CommitCraft is a command-line interface (CLI) tool that generates commit messages for stashed changes in two formats: generic and conventional commit. It leverages the power of OpenAI to create meaningful and descriptive commit messages.
 
-**Features:**
-- **Stash-based Commit Generation:** CommitCraft enables you to generate Git commits directly from stashed changes.
-- **Two Commit Formats:** Choose between two commit formats: raw commit or conventional commit, based on your preferences and project requirements.
-- **Flexible Configuration:** Easily configure CommitCraft with various options, including API key management for integration with external services.
+## Features
 
-**Usage:**
+- Generates commit messages for stashed changes
+- Supports two formats: generic and conventional commit
+- Utilizes OpenAI for intelligent commit message generation
+- Allows adding a summarized description to the commit body
 
-```bash
-commitcraft
+## Installation
+
+You can install CommitCraft using Homebrew:
+
+```
+brew install leventekk/commitcraft
 ```
 
-**Commands:**  
-- `generate`: Generates a commit messages.
-  - `--format <format>`: Specifies the desired commit format. Accepts values: `raw` or `conventional`. Default is `raw`.
-- `config`: Configure CommitCraft settings.
-  - `--api-key <api_key>`: Set the OpenAI API key for enhanced functionality.
-  - `--add-description <add_description>`: Includes a detailed description into the commit body.
+## Usage
 
-**Examples:**  
-1. Generate a raw format commit:  
+### Generating Commit Messages
 
-```bash
-commitcraft generate --format raw
+To generate a commit message, use the `generate` command:
+
+```
+commitcraft generate
 ```
 
-2. Generate a conventional commit:  
+By default, it generates a commit message in the conventional commit format. You can specify the format using the `-f` or `--format` flag:
 
-```bash
-commitcraft generate --format conventional
+```
+commitcraft generate -f raw
 ```
 
-3. Configure CommitCraft with an API key:  
+To include a summarized description in the commit body, use the `-d` or `--description` flag:
 
-```bash
-commitcraft config --api-key <your_api_key>
 ```
+commitcraft generate -d
+```
+
+### Configuring API Key
+
+To set the OpenAI API key, use the `config` command with the `--api-key` flag:
+
+```
+commitcraft config --api-key YOUR_API_KEY
+```
+
+Replace `YOUR_API_KEY` with your actual OpenAI API key.
+
+## License
+
+CommitCraft is released under the [MIT License](https://opensource.org/licenses/MIT).
