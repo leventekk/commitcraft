@@ -21,10 +21,6 @@ enum Commands {
 		/// set api key for the OpenAI API
 		#[arg(long)]
 		api_key: Option<String>,
-
-		/// add description to the commit message
-		#[arg(long)]
-		add_description: Option<bool>,
 	},
 
 	/// Generate a commit message
@@ -32,6 +28,10 @@ enum Commands {
 		/// Format of the commit message
 		#[arg(short, long, value_enum, default_value = "conventional")]
 		format: Format,
+
+		/// add description to the commit message
+		#[arg(short, long, default_value = "false")]
+		description: bool,
 	},
 }
 
@@ -41,19 +41,18 @@ async fn main() -> Result<()> {
 	let args = Cli::parse();
 
 	match args.command {
-		Some(Commands::Config {
-			api_key,
-			add_description,
-		}) => {
+		Some(Commands::Config { api_key }) => {
 			let _ = ConfigCommand::update_config(ConfigOptions {
 				api_key: api_key.to_owned(),
-				add_description: add_description.to_owned(),
 			});
 		}
-		Some(Commands::Generate { format }) => {
+		Some(Commands::Generate {
+			format,
+			description,
+		}) => {
 			let _ = GenerateMessageCommand::generate_message(
 				&app_config.openai_api_key,
-				&app_config.add_description,
+				&description,
 				&format,
 			)
 			.await;
