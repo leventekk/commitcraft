@@ -1,5 +1,3 @@
-pub struct Backup {}
-
 use std::{
 	env,
 	fs::{self, File},
@@ -9,7 +7,7 @@ use std::{
 
 use crate::prelude::Result;
 
-const BACKUP_FILE: &str = "commitcraft-backup";
+pub struct Backup {}
 
 impl Backup {
 	pub fn commit(message: &str) -> Result<()> {
@@ -44,9 +42,11 @@ impl Backup {
 	}
 }
 
+const BACKUP_FILE_NAME: &str = "commitcraft-backup";
+
 fn get_file_path() -> Result<PathBuf> {
 	let dir = env::temp_dir();
-	let file_path = dir.join(BACKUP_FILE);
+	let file_path = dir.join(BACKUP_FILE_NAME);
 
 	Ok(file_path)
 }

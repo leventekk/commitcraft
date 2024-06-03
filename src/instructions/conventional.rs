@@ -161,7 +161,8 @@ feat(generator): improve conventional commit generation prompt
 You should respond with a conventional commit message, which is a short and concise description of the changes made in the file.
 You can find the definition of a conventional commit message here: https://www.conventionalcommits.org/en/v1.0.0/
 Here are the allowed types that you can use: feat, fix, docs, style, refactor, test, chore, perf, ci
-When defining the scope, please use the context of the changes of the code, but keep it short and concise, like 'parser', 'lexer', 'compiler', etc, and lowercase.
+When defining the scope, please use the context of the changes of the code, but keep it short and concise, like 'parser', 'lexer', 'compiler', etc, 
+and it's important to use lowercase.
             "###,
 			if *with_description {
 				r#"

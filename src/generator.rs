@@ -27,8 +27,8 @@ impl Generator {
 				Ok(extract_response_choice(response).unwrap_or_default())
 			}
 			Err(error) => {
-				let v =
-					serde_json::from_str::<RequestError>(&error.to_string()).unwrap();
+				let v = serde_json::from_str::<RequestError>(&error.to_string())
+					.unwrap();
 
 				Err(v.message)
 			}
