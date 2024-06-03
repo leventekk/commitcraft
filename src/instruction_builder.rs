@@ -14,6 +14,8 @@ The user will provide you a Git diff file, and you will have to parse it and ext
 When summarizing the changes, you should not include the actual code changes, but the context of the changes.
 If the given input contains some mardown or a git diff, exclude it from the processing.
 
+Do not focus on lock files, binaries, or any other files that are not related to the codebase.
+
 ### examples ###
 
 Here are some examples of the input given by the user and the desired output you should build.
