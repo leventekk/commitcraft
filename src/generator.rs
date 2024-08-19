@@ -1,9 +1,9 @@
 use openai_dive::v1::api::Client;
 use openai_dive::v1::error::APIError;
-use openai_dive::v1::models::Gpt35Engine;
+use openai_dive::v1::models::Gpt4Engine;
 use openai_dive::v1::resources::chat::{
-	ChatCompletionParameters, ChatCompletionResponse, ChatMessage,
-	ChatMessageContent, Role,
+	ChatCompletionParametersBuilder, ChatCompletionResponse,
+	ChatCompletionResponseFormat, ChatMessage, ChatMessageContent,
 };
 use serde::Deserialize;
 
@@ -43,25 +43,32 @@ async fn execute_request(
 ) -> Result<ChatCompletionResponse, APIError> {
 	let client = Client::new(api_key.to_string());
 
-	let parameters = ChatCompletionParameters {
-		model: Gpt35Engine::Gpt35Turbo1106.to_string(),
-		messages: vec![
-			ChatMessage {
-				role: Role::System,
+	let parameters = ChatCompletionParametersBuilder::default()
+		.model(Gpt4Engine::Gpt4OMini.to_string())
+		.messages(vec![
+			ChatMessage::System {
 				content: ChatMessageContent::Text(system_messge.to_string()),
-				..Default::default()
+				name: None,
 			},
-			ChatMessage {
-				role: Role::User,
+			ChatMessage::User {
 				content: ChatMessageContent::Text(user_message.to_string()),
-				..Default::default()
+				name: None,
 			},
-		],
-		temperature: Some(0.2),
-		..Default::default()
-	};
+		])
+		.temperature(0.2)
+		.response_format(ChatCompletionResponseFormat::Text)
+		.build();
 
-	client.chat().create(parameters).await
+	if let Ok(parameters) = parameters {
+		match client.chat().create(parameters).await {
+			Ok(response) => Ok(response),
+			Err(error) => Err(error),
+		}
+	} else {
+		Err(APIError::BadRequestError(
+			("Failed to build parameters").to_string(),
+		))
+	}
 }
 
 fn prettify_message(message: ChatMessageContent) -> Option<String> {
@@ -75,7 +82,18 @@ fn extract_response_choice(response: ChatCompletionResponse) -> Option<String> {
 	response
 		.choices
 		.into_iter()
-		.filter_map(|choice| prettify_message(choice.message.content))
+		.filter_map(|choice| match choice.message {
+			ChatMessage::User { content, .. } => prettify_message(content),
+			ChatMessage::System { content, .. } => prettify_message(content),
+			ChatMessage::Assistant { content, .. } => {
+				if let Some(content) = content {
+					prettify_message(content)
+				} else {
+					None
+				}
+			}
+			_ => None,
+		})
 		.collect::<Vec<_>>()
 		.first()
 		.cloned()
