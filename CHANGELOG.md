@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.6] - 2024-08-19
+### :sparkles: New Features
+- [`14539a8`](https://github.com/leventekk/commitcraft/commit/14539a870c566bbe85cd24af026c4bc750736bb8) - **instruction**: ignore some files to get more accurate commit message *(commit by [@leventekk](https://github.com/leventekk))*
+- [`a14df0f`](https://github.com/leventekk/commitcraft/commit/a14df0f6cf7b842c7692fca9464e557fdd6c51ae) - **package**: update version to 0.9.6 *(commit by [@leventekk](https://github.com/leventekk))*
+
+### :bug: Bug Fixes
+- [`180474a`](https://github.com/leventekk/commitcraft/commit/180474ab43afc95e1c5b890baf6d7d9504589040) - **generator**: update model to Gpt4 and improve request handling *(PR [#1](https://github.com/leventekk/commitcraft/pull/1) by [@leventekk](https://github.com/leventekk))*
+
+### :wrench: Chores
+- [`e0d99e6`](https://github.com/leventekk/commitcraft/commit/e0d99e6aea67d9fc48a40132fd16cf09cd8cabe8) - **tests**: add some basic test cases for executor *(commit by [@leventekk](https://github.com/leventekk))*
+- [`9e9f2a8`](https://github.com/leventekk/commitcraft/commit/9e9f2a86fa0d54078729c9d57a62dade804edb6a) - update code style *(commit by [@leventekk](https://github.com/leventekk))*
+
+
 ## [v0.9.5] - 2024-05-16
 ### :sparkles: New Features
 - [`ac1973c`](https://github.com/leventekk/commitcraft/commit/ac1973cf1e1ec27d26340c5c82bcc7c5a338e5c2) - **config**: remove add_description field and related functionality from AppConfig and ConfigOptions *(commit by [@leventekk](https://github.com/leventekk))*
@@ -50,3 +63,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [v0.9.3]: https://github.com/leventekk/commitcraft/compare/v0.9.2...v0.9.3
 [v0.9.4]: https://github.com/leventekk/commitcraft/compare/v0.9.3...v0.9.4
 [v0.9.5]: https://github.com/leventekk/commitcraft/compare/v0.9.4...v0.9.5
+[v0.9.6]: https://github.com/leventekk/commitcraft/compare/v0.9.5...v0.9.6
